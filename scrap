@@ -1,0 +1,33 @@
+import urllib2 as u
+import re
+
+if __name__ == "__main__":
+    Seiten = []
+    Seiten.append("http://www.kochrezepte.de/rs.a1.html")
+    for i in Seiten:
+        try:
+            Seite = u.urlopen(i)
+            
+            for line in Seite:
+                try:
+                    if "href=\"" in line:
+                        lines = line.split("\"")
+                    elif "href='" in line:
+                        lines = line.split("'")
+                    elif "href=h" in line:
+                        lines = line.split("href=")
+                    for l in lines:
+                        m = re.search("http(s)?://www.uni-potsdam.de(.)*$", l)
+                        if m:
+                            string = m.group()
+                            if not (".pdf" in string or ".PDF" in string):
+                                if string not in Seiten:
+                                    Seiten.append(string)
+                            else:
+                                pdf += 1
+                                print "pdf" , pdf
+                except:
+                    pass            
+        except:
+            pass
+    print Seiten
