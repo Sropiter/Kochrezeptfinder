@@ -2,32 +2,49 @@ import urllib2 as u
 import re
 
 if __name__ == "__main__":
-    Seiten = []
-    Seiten.append("http://www.kochrezepte.de/rs.a1.html")
+    Seiten = [] 
+    Rezeptlinks = []
+    Seiten.append("http://www.kochrezepte.de/rs.a1p0.html")
+    for i in range(0,1,1):
+        Seiten.append("http://www.kochrezepte.de/rs.a1p"+str(i)+".html")
     for i in Seiten:
         try:
             Seite = u.urlopen(i)
-            
-            for line in Seite:
-                try:
-                    if "href=\"" in line:
-                        lines = line.split("\"")
-                    elif "href='" in line:
-                        lines = line.split("'")
-                    elif "href=h" in line:
-                        lines = line.split("href=")
-                    for l in lines:
-                        m = re.search("http(s)?://www.uni-potsdam.de(.)*$", l)
-                        if m:
-                            string = m.group()
-                            if not (".pdf" in string or ".PDF" in string):
-                                if string not in Seiten:
-                                    Seiten.append(string)
-                            else:
-                                pdf += 1
-                                print "pdf" , pdf
-                except:
-                    pass            
         except:
             pass
-    print Seiten
+        for a in Seite:
+            if  "class=\"$paging:true\" href=\"" in a:
+                Zeile = a.split("class=\"$paging:true\" href=\"")
+                Zeile = Zeile[1].split("\"")
+                Rezeptlinks.append("http://www.kochrezepte.de/"+Zeile[0])
+    
+    Datei = open("DATENBASIS.hihi","w")
+    
+    for i in Rezeptlinks:
+        Seite = u.urlopen(i)
+        for line in Seite:
+            line = line.replace("&amp;#252;","ue")
+            if "<h2 class=\"small\">" in line:
+                Zeile = line.split("<h2 class=\"small\">")
+                Zeile = Zeile[1].split(" Rezept")
+                Datei.write(Zeile[0])
+                Datei.write(";;")
+            if "<span class=\"amount\">" in line:
+                Zeile = line.split("<span class=\"amount\">")
+                Zeile = Zeile[1].split("</span>&nbsp;<span class=\"name\"><a title=\"Weitere Rezepte mit ")
+                ZeileN = Zeile[0].replace("&nbsp;"," ")
+                Datei.write(ZeileN)
+                Datei.write(" ")
+                ZeileN = Zeile[1].split("\"")
+                Datei.write(ZeileN[0])
+                Datei.write(";;")
+            if "<p class=\"space instructions\">" in line:
+                Zeile = line.replace("<p class=\"space instructions\">","")
+                Zeile = Zeile.replace("<\p>","")
+                Datei.write(Zeile)
+                Datei.write(";;")
+        Datei.write("\n")
+    Datei.close
+                
+                
+    
